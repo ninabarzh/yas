@@ -1,3 +1,22 @@
+[tool.pytest.ini_options]
+# Add the current directory to PYTHONPATH
+pythonpath = "."
+
+# The directory where pytest should look for tests
+testpaths = ["tests"]
+
+# Enable logging output during test execution
+log_cli = true
+log_level = "INFO"
+
+# Currently, the event loop scope defaults to the fixture caching scope, but in the future, it will default to
+# function scope. To avoid unexpected behavior when upgrading pytest-asyncio, explicitly set the loop scope:
+asyncio_default_fixture_loop_scope = "function"
+
+# Addopts: Enable verbose output and coverage reporting
+addopts = "-v --showlocals --cov=backend --cov-report=term-missing"
+
+#---------------------------------------------------------------------------------------------------------------
 [tool.ruff]
 # Same as Black.
 line-length = 88
@@ -17,6 +36,7 @@ ignore = []
 fixable = ["ALL"]
 unfixable = []
 
+#---------------------------------------------------------------------------------------------------------------
 [tool.ruff.format]
 
 # Like Black, use double quotes for strings.
@@ -45,5 +65,6 @@ docstring-code-format = false
 # enabled.
 docstring-code-line-length = "dynamic"
 
+#---------------------------------------------------------------------------------------------------------------
 [tool.ruff.lint.pydocstyle]
 convention = "google"  # Accepts: "google", "numpy", or "pep257".

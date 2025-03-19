@@ -1,40 +1,22 @@
 # YAS
 
-Yet Another Searchengine: A MeiliSearch backend with a Python Flask frontend and an Nginx reverse proxy.
+Yet Another Searchengine: a project with MeiliSearch as the backend, Starlette as the frontend, and Docker for 
+containerization
 
-## Build and Run the Docker Containers
+## Build and run the containers
 
-Navigate to the directory containing the docker-compose.yml file and run:
-
+Up:
 ```commandline
 docker-compose up --build
 ```
-This will build the Python frontend image and start the MeiliSearch, Python frontend, and Nginx containers.
 
-## Interacting with MeiliSearch
-
-### Temporary
-
-* https://www.meilisearch.com/docs/guides/misc/docker
-
-Copy the `data.json` file into the MeiliSearch container:
-
+Down (and remove):
 ```commandline
-docker cp data.json meilisearch:/data.json
+docker-compose up --build
 ```
 
-Use curl to load the data into MeiliSearch:
+## Access the services:
 
-```commandline
-curl -X POST 'http://localhost:7700/indexes/ossfinder/documents' \
-     -H 'Authorization: Bearer master_key' \
-     -H 'Content-Type: application/json' \
-     --data-binary @data.json
-```
-
-Replace your_master_key_here with the actual master key. 
-
-## Access the application
-
-* MeiliSearch: Access the MeiliSearch dashboard at http://localhost:7700/.
-* Python Frontend Search page: Access the application at http://localhost:5000/search.
+* MeiliSearch: http://localhost:7700
+* Backend: http://localhost:8000
+* Frontend: http://localhost:8001

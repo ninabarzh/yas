@@ -3,37 +3,27 @@ services:
     image: getmeili/meilisearch:v1.13
     container_name: meilisearch
     environment:
-      # Optional: Set a master key for secure access
-      # For production, use environment variables
-      - MEILI_MASTER_KEY=master_key
+      MEILI_MASTER_KEY: "masterKey"
     ports:
-      # Runs on port 7700 by default
       - "7700:7700"
     volumes:
       - meili_data:/data.ms
-    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - meilisearch
 
   frontend:
-    build: ./frontend  # Path to the Python frontend directory
+    build: ./frontend
     container_name: frontend
     ports:
-      - "5000:5000"
+      - "8001:8001"
     depends_on:
-      - meilisearch
-    restart: unless-stopped
-
-  nginx:
-    image: nginx:mainline-perl
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - meilisearch
-      - frontend
-    restart: unless-stopped
+      - backend
 
 volumes:
-  # Persist the MeiliSearch data
   meili_data:

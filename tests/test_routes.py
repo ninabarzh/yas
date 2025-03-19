@@ -1,7 +1,6 @@
 import pytest
 from backend.main import app  # Import your Starlette app
-from meilisearch import Client
-from  meilisearch.models.task import TaskInfo
+from meilisearch.models.task import TaskInfo
 from datetime import datetime
 from starlette.testclient import TestClient
 import sys

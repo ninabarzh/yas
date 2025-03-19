@@ -1,7 +1,6 @@
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
-from .meilisearch_client import add_documents, search
 from meilisearch import Client
 import logging
 
@@ -19,7 +18,6 @@ except Exception as e:
     logger.error(f"Failed to initialize MeiliSearch client: {e}")
     raise
 
-
 # Define search function
 def search(index_name, query):
     try:
@@ -29,7 +27,6 @@ def search(index_name, query):
     except Exception as e:
         logger.error(f"Error in search function: {e}")
         raise
-
 
 # Define routes
 async def add(request):

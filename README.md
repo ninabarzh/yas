@@ -15,8 +15,8 @@ not a good choice for production anyway. This suggests that the issue might not 
 mounts but rather to how Meilisearch is handling the data internally, possibly to drive projects to their cloud 
 solution, which supports BigTech. 
 
-Something we vowed not to contribute to. We keep this repo for later, and start a new repo trying out another search 
-engine, Typesense.
+Something we vowed not to contribute to. We keep this repo for later, and start a new repo [trying out another search 
+engine, Typesense](https://github.com/ninabarzh/pers).
 
 ## Build and run the containers
 

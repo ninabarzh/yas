@@ -12,7 +12,7 @@ docker-compose up --build
 
 Down (and remove):
 ```commandline
-docker-compose up --build
+docker-compose down
 ```
 
 ## Access the services:

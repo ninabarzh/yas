@@ -16,7 +16,9 @@
 
             try {
                 // Send the search query to the backend /search endpoint
-                const response = await fetch(`http://127.0.0.1:8000/search?query=${encodeURIComponent(query)}`);
+                const response = await fetch(
+                    `http://127.0.0.1:8000/search?index_name=ossfinder&query=${encodeURIComponent(query)}`
+                );
                 if (!response.ok) {
                     throw new Error('Failed to search data');
                 }
@@ -30,7 +32,13 @@
                     resultsDiv.innerHTML += '<p>No results found.</p>';
                 } else {
                     results.hits.forEach((hit) => {
-                        resultsDiv.innerHTML += `<p><strong>${hit.title}</strong> - ${hit.genre}</p>`;
+                        resultsDiv.innerHTML += `
+                            <div>
+                                <p><strong>${hit.name}</strong> - ${hit.organisation}</p>
+                                <p>${hit.description}</p>
+                                <p><a href="${hit.url}" target="_blank">View Repository</a></p>
+                            </div>
+                        `;
                     });
                 }
             } catch (error) {

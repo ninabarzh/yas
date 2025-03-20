@@ -1,13 +1,26 @@
 services:
   meilisearch:
-    image: getmeili/meilisearch:v1.13
+    image: getmeili/meilisearch:latest
     container_name: meilisearch
-    environment:
-      MEILI_MASTER_KEY: "masterKey"
     ports:
       - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: "masterKey"  # Replace with your actual master key
+      MEILI_DB_PATH: "postgres://user:password@postgres:5432/meilisearch"  # PostgreSQL connection string
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: meilisearch
     volumes:
-      - meili_data:/data.ms
+      - ./postgres_data:/var/lib/postgresql/data  # Bind mount for PostgreSQL data
+    restart: unless-stopped
 
   backend:
     build: ./backend
@@ -16,6 +29,7 @@ services:
       - "8000:8000"
     depends_on:
       - meilisearch
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
@@ -24,6 +38,7 @@ services:
       - "8001:8001"
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
-  meili_data:
+  postgres_data:

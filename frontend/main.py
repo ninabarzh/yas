@@ -1,34 +1,28 @@
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.responses import HTMLResponse, FileResponse, JSONResponse
 from starlette.routing import Route
-import httpx
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from pathlib import Path
 
-# Define routes
-async def health(request):
-    return JSONResponse({"status": "ok"})
+# Configure Jinja2 environment
+templates = Environment(
+    loader=FileSystemLoader("templates"),  # Load templates from the "templates" directory
+    autoescape=select_autoescape(["html", "xml"]),
+)
 
-async def homepage(request):
-    return PlainTextResponse("Welcome to the Frontend!")
+# Frontend routes
+async def search_page(request):
+    template = templates.get_template("search.html")
+    return HTMLResponse(template.render(title="Search Data"))
 
-async def search(request):
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            'http://backend:8000/search',
-            params=request.query_params
-        )
-        return JSONResponse(response.json())
+async def upload_page(request):
+    template = templates.get_template("upload.html")  # Use the new upload template
+    return HTMLResponse(template.render(title="Upload Data"))
 
 
-# Create a Router
-routes = [
-    Route("/", homepage, methods=["GET"]),  # Homepage route
-    Route("/search", search, methods=["GET"]),
-    Route("/health", health, methods=["GET"]),
-]
-
-# Initialize the app
-app = Starlette(routes=routes)
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+app = Starlette(
+    routes=[
+        Route("/", search_page),  # Home page (search)
+        Route("/upload", upload_page),  # Upload data to index
+    ],
+)

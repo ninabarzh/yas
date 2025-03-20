@@ -1,14 +1,27 @@
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
+from starlette.requests import Request
+from starlette.middleware.cors import CORSMiddleware
 from meilisearch import Client
+# from meilisearch.models.task import TaskInfo
+from dotenv import load_dotenv
 import logging
+import os
+import json
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize MeiliSearch client
+meili_client = Client(
+    os.getenv("MEILI_SEARCH_URL"),  # Get MeiliSearch URL from .env
+    os.getenv("MEILI_SEARCH_MASTER_KEY")  # Get MeiliSearch master key from .env
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 # Initialize MeiliSearch client
 try:
@@ -17,6 +30,14 @@ try:
 except Exception as e:
     logger.error(f"Failed to initialize MeiliSearch client: {e}")
     raise
+
+
+# Add documents to MeiliSearch
+def add_documents(index_name, documents):
+    index = meili_client.index(index_name)
+    task_info = index.add_documents(documents)
+    return task_info
+
 
 # Define search function
 def search(index_name, query):
@@ -28,7 +49,33 @@ def search(index_name, query):
         logger.error(f"Error in search function: {e}")
         raise
 
+
 # Define routes
+
+# Handle file upload
+async def upload_file(request: Request):
+    try:
+        # Parse the uploaded file
+        form_data = await request.form()
+        file = form_data["file"]
+        content = await file.read()
+        documents = json.loads(content)
+
+        # Add documents to the index
+        task_info = add_documents("ossfinder", documents)
+
+        # Return the task info
+        return JSONResponse({
+            "status": task_info.status,
+            "taskUid": task_info.task_uid,
+            "indexUid": task_info.index_uid,
+            "type": task_info.type,
+            "enqueuedAt": task_info.enqueued_at.isoformat() if task_info.enqueued_at else None,
+        })
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
 async def add(request):
     try:
         # Parse request data
@@ -96,10 +143,12 @@ async def search_docs(request):
         )
 
 
+# noinspection PyUnusedLocal
 async def homepage(request):
     return PlainTextResponse("Welcome to the Backend!")
 
 
+# noinspection PyUnusedLocal
 async def health(request):
     return JSONResponse({"status": "ok"})
 
@@ -107,14 +156,28 @@ async def health(request):
 # Create a Router
 routes = [
     Route("/", homepage, methods=["GET"]),  # Homepage route
+    Route("/upload", upload_file, methods=["POST"]),
     Route("/add", add, methods=["POST"]),
     Route("/search", search_docs, methods=["GET"]),
     Route("/health", health, methods=["GET"]),
 ]
 
+
 # Initialize the app
 app = Starlette(routes=routes)
 
+
+# Add CORS middleware
+# noinspection PyTypeChecker
+app.add_middleware(
+    CORSMiddleware,  # Pass the class, not an instance
+    allow_origins=["http://127.0.0.1:8001"],  # Allow requests from the frontend
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

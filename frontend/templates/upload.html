@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Upload JSON to MeiliSearch</h2>
+    <form id="upload-form">
+        <input type="file" id="json-file" accept=".json" required>
+        <button type="submit">Upload</button>
+    </form>
+    <p id="status"></p>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('json-file');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a JSON file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                // Send the file to the backend /upload endpoint
+                const response = await fetch('http://127.0.0.1:8000/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to upload file');
+                }
+
+                // Parse the backend response
+                const result = await response.json();
+                document.getElementById('status').innerText = 'File uploaded successfully!';
+                console.log('File uploaded successfully:', result);
+            } catch (error) {
+                document.getElementById('status').innerText = 'Error uploading file: ' + error.message;
+                console.error('Error uploading file:', error);
+            }
+        });
+    </script>
+{% endblock %}

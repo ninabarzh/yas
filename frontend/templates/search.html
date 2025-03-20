@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Search OSSfinder Index</h2>
+    <form id="search-form">
+        <input type="text" id="query" placeholder="Enter search query" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('search-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const query = document.getElementById('query').value;
+
+            try {
+                // Send the search query to the backend /search endpoint
+                const response = await fetch(`http://127.0.0.1:8000/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    throw new Error('Failed to search data');
+                }
+
+                // Parse the search results
+                const results = await response.json();
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '<h3>Search Results:</h3>';
+
+                if (results.hits.length === 0) {
+                    resultsDiv.innerHTML += '<p>No results found.</p>';
+                } else {
+                    results.hits.forEach((hit) => {
+                        resultsDiv.innerHTML += `<p><strong>${hit.title}</strong> - ${hit.genre}</p>`;
+                    });
+                }
+            } catch (error) {
+                document.getElementById('results').innerText = 'Error searching data: ' + error.message;
+                console.error('Error searching data:', error);
+            }
+        });
+    </script>
+{% endblock %}

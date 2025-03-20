@@ -1,7 +1,7 @@
-# YAS
+# YAS (Under Construction)
 
-Yet Another Searchengine: a project with MeiliSearch as the backend, Starlette as the frontend, and Docker for 
-containerization
+Yet Another Search engine: a project with MeiliSearch as the backend, Starlette as the frontend, and Docker for 
+containerization, to be deployed to Hetzner using Sliplane.
 
 ## Build and run the containers
 
